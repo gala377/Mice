@@ -1,11 +1,12 @@
 import time
 from typing import TypeVar
 from ecs.system import (
-    YieldKind,
     System,
     GeneratorSystem,
-    ok,
+)
+from ecs.executor import (
     AsyncWait,
+    ResumePolicy,
 )
 
 
@@ -57,4 +58,4 @@ class HelloWorld(GeneratorSystem):
         while True:
             print(f"Hello this is my #{self.i} iteration!")
             self.i += 1
-            yield ok
+            yield
