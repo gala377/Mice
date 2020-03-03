@@ -1,0 +1,35 @@
+name: Python application
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python-version: 3.8.2
+        poetry_version: 1.0.3
+        args: install
+    - name: Run black formatter
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.2
+        poetry_version: 1.0.3
+        args: run black src
+    - name: Lint with flake8
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.2
+        poetry_version: 1.0.3
+        args: run flake8 src
+    - name: Test with pytest
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.2
+        poetry_version: 1.0.3
+        args: run pytest
