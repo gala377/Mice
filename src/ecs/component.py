@@ -1,0 +1,3 @@
+
+# A marker class
+class Component: ...

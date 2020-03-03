@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "mice"
+version = "0.1.0"
+description = "A simple game engine on top of pygame"
+license = "MIT"
+authors = ["Rafał Galczak <r.galczak@gmail.com>"]
+packages = [ 
+    { include = "mice", from = "src" },
+    { include = "ecs", from = "src" },
+]
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pylint = "^2.4.4"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
