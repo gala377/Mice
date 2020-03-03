@@ -1,0 +1,31 @@
+name: Python application
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+    - name: Install
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python-version: 3.8
+        poetry_version: 0.12.17
+        args: install
+    - name: Run black formatter
+      run: |
+        black src
+        black tests
+    - name: Lint with flake8
+      run: |
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 src --statistics
+        flake8 tests --statistics
+    - name: Test with pytest
+      run: |
+        pytest
