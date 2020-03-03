@@ -9,8 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v1
     - name: Install
       uses: abatilo/actions-poetry@v1.5.0
       with:
@@ -18,14 +16,20 @@ jobs:
         poetry_version: 0.12.17
         args: install
     - name: Run black formatter
-      run: |
-        black src
-        black tests
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.0
+        poetry_version: 0.12.17
+        args: run black src
     - name: Lint with flake8
-      run: |
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 src --statistics
-        flake8 tests --statistics
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.0
+        poetry_version: 0.12.17
+        args: run flake8 src
     - name: Test with pytest
-      run: |
-        pytest
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.0
+        poetry_version: 0.12.17
+        args: run pytest
