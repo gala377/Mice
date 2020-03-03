@@ -8,6 +8,7 @@ from ecs.system import (
     AsyncWait,
 )
 
+
 class Wait(System):
 
     wait_time: float
@@ -21,7 +22,7 @@ class Wait(System):
         print("Waky waky")
 
 
-T = TypeVar('T') 
+T = TypeVar("T")
 
 
 def async_wait(wait_time: float, ret_val: T) -> T:
@@ -30,7 +31,7 @@ def async_wait(wait_time: float, ret_val: T) -> T:
 
 
 class WaitAsync(GeneratorSystem):
-    
+
     wait_time: float
 
     def __init__(self, wait_time: float):
@@ -40,14 +41,14 @@ class WaitAsync(GeneratorSystem):
         i = 0
         while True:
             print("Async nigh nigh")
-            ret = (yield AsyncWait(async_wait, self.wait_time, i))
+            ret = yield AsyncWait(async_wait, self.wait_time, i)
             print(f"Async waky waky with value {ret}")
             i = ret + 1
 
 
 class HelloWorld(GeneratorSystem):
 
-    i: int 
+    i: int
 
     def __init__(self, start_from=0):
         self.i = start_from

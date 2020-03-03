@@ -1,9 +1,6 @@
 import weakref
 
-from abc import (
-    ABC,
-    abstractmethod
-)
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import (
     Union,
@@ -29,31 +26,35 @@ class Entity:
 
     id: GenId
     components: Sequence[Component]
-    _storage: weakref.ProxyType # Storage weakref
+    _storage: weakref.ProxyType  # Storage weakref
 
     def __del__(self):
         self._storage.remove_entity(self.id)
 
 
-StorageKey = Union[GenId, Type[Component]] 
+StorageKey = Union[GenId, Type[Component]]
 
 
 class Storage(ABC):
+    @abstractmethod
+    def register(self, comp: Type[Component]):
+        ...
 
     @abstractmethod
-    def register(self, comp: Type[Component]): ...
+    def get_entity(self, id: GenId) -> Optional[Entity]:
+        ...
 
     @abstractmethod
-    def get_entity(self, id: GenId) -> Optional[Entity]: ...
+    def get_component(self, comp: Type[Component]) -> Sequence[Type[Component]]:
+        ...
 
     @abstractmethod
-    def get_component(self, comp: Type[Component]) -> Sequence[Type[Component]]: ...
+    def create_entity(self, comp: Sequence[Component]) -> Entity:
+        ...
 
     @abstractmethod
-    def create_entity(self, comp: Sequence[Component]) -> Entity: ...
-
-    @abstractmethod
-    def remove_entity(self, id: GenId): ...
+    def remove_entity(self, id: GenId):
+        ...
 
 
 class SOAStorage(Storage):
@@ -78,16 +79,17 @@ class SOAStorage(Storage):
         self.last_id += 1
         for comp in comps:
             self.components[comp].append(comp)
-        
-        lists_to_resize = [val for key, val in self.components.items() if key not in comps]
+
+        lists_to_resize = [
+            val for key, val in self.components.items() if key not in comps
+        ]
         for val in lists_to_resize:
             val.append(None)
 
         return Entity(id, comps, weakref.proxy(self))
-    
+
     def remove_entity(self, id: GenId):
         self.free_ids.add(id.id)
-
 
     def get_entity(self, id: GenId) -> Optional[Entity]:
         if id.id in self.free_ids:
@@ -103,4 +105,3 @@ class SOAStorage(Storage):
         comps = self.components.get(comp, default=[])
         comps = [c for i, c in enumerate(comps) if i not in self.free_ids]
         return comps
-

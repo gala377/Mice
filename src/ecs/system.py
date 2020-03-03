@@ -15,12 +15,16 @@ from typing import (
 from ecs import entity
 
 
-class YieldKind: ... 
+class YieldKind:
+    ...
 
 
-class Ok(YieldKind): ...
+class Ok(YieldKind):
+    ...
+
 
 ok = Ok()
+
 
 class AsyncWait(YieldKind):
 
@@ -33,8 +37,8 @@ class AsyncWait(YieldKind):
         self.args = args
         self.kwargs = kwargs
 
+
 class System(ABC):
-    
     def update(self, storage: entity.Storage):
         return
 
@@ -42,12 +46,14 @@ class System(ABC):
         return self
 
     @abstractmethod
-    def __next__(self) -> YieldKind: ...
+    def __next__(self) -> YieldKind:
+        ...
+
 
 class GeneratorSystem(System):
-
     @abstractmethod
-    def __iter__(self) -> Iterator[YieldKind]: ...
+    def __iter__(self) -> Iterator[YieldKind]:
+        ...
 
     def __next__(self):
         return None

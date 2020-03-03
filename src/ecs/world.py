@@ -23,6 +23,7 @@ from ecs import entity
 
 SystemState = Tuple[System, Iterator[YieldKind]]
 
+
 class World:
 
     systems: Mapping[str, SystemState]
@@ -34,7 +35,7 @@ class World:
         self.stopped_systems = {}
         self.entity_storage = entity.SOAStorage()
         self.pool = mp.Pool()
-    
+
     def register(self, system: System, name: str = None):
         if name is None:
             name = system.__class__.__name__
@@ -62,9 +63,9 @@ class World:
 
     @property
     def active_systems(self) -> Mapping[str, SystemState]:
-        return { 
-            name: state 
-            for name, state in self.systems.items() 
+        return {
+            name: state
+            for name, state in self.systems.items()
             if name not in self.stopped_systems
         }
 
@@ -77,11 +78,7 @@ class World:
             Flase if the system should be paused.
         """
         if isinstance(yieldk, AsyncWait):
-            self.async_wait(
-                system_name,
-                yieldk.func,
-                *yieldk.args,
-                **yieldk.kwargs)
+            self.async_wait(system_name, yieldk.func, *yieldk.args, **yieldk.kwargs)
             return False
         return True
 
