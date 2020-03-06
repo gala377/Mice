@@ -17,6 +17,7 @@ pytest = "^5.2"
 pylint = "^2.4.4"
 flake8 = "^3.7.9"
 black = "^19.10b0"
+mypy = "^0.761.0"
 
 [build-system]
 requires = ["poetry>=1.0.3"]
