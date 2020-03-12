@@ -8,9 +8,9 @@ packages = [
     { include = "mice", from = "src" },
     { include = "ecs", from = "src" },
 ]
+
 [tool.poetry.dependencies]
 python = "^3.8"
-
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -18,10 +18,15 @@ pylint = "^2.4.4"
 flake8 = "^3.7.9"
 black = "^19.10b0"
 mypy = "^0.761.0"
+typer = "^0.0.10"
+rope = "^0.16.0"
+
+[tool.black]
+line-lenght = 79
 
 [build-system]
 requires = ["poetry>=1.0.3"]
 build-backend = "poetry.masonry.api"
 
-[tool.black]
-line-lenght = 79
+[tool.poetry.scripts]
+x = 'x:main'
