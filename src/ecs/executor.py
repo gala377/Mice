@@ -8,15 +8,14 @@ import logging
 import multiprocessing as mc
 from multiprocessing.pool import AsyncResult
 from typing import (
-    Iterable,
-    Iterator,
     Mapping,
+    MutableMapping,
     Tuple,
     Callable,
     Any,
+    Generator,
 )
 
-import ecs
 from ecs.system import System
 from ecs import entity
 
@@ -30,11 +29,13 @@ class ResumePolicy:
 
 class AsyncWait(ResumePolicy):
 
-    func: Callable
-    args: Tuple[Any]
+    # should be Callable[..., Any] but mypy thinks its a method
+    # and doesn't allow any assignments
+    func: Any
+    args: Tuple[Any, ...]
     kwargs: Mapping[str, Any]
 
-    def __init__(self, func: Callable, *args: Any, **kwargs: Any):
+    def __init__(self, func: Callable[..., Any], *args: Any, **kwargs: Any):
         self.func = func
         self.args = args
         self.kwargs = kwargs
@@ -48,14 +49,14 @@ class Executor(ABC):
         ...
 
 
-SystemState = Iterator[ResumePolicy]
+SystemState = Generator[ResumePolicy, Any, Any]
 
 
 class SimpleExecutor(Executor):
 
-    systems: Mapping[str, SystemState]
-    stopped_systems: Mapping[str, AsyncResult]
-    pool: mc.Pool
+    systems: MutableMapping[str, SystemState]
+    stopped_systems: MutableMapping[str, AsyncResult]
+    pool: mc.pool.Pool
 
     def __init__(self):
         super().__init__()
@@ -66,7 +67,7 @@ class SimpleExecutor(Executor):
     def run_iteration(
         self, systems: Mapping[str, System], entity_storage: entity.Storage,
     ):
-        for name, (system, iterator) in self.active_systems.items():
+        for name, (system, iterator) in self.active_systems(systems).items():
             LOGGER.debug("[%s]: Running %s system.", time.time(), name)
             system.update(entity_storage)
             res = next(iterator)
@@ -75,7 +76,6 @@ class SimpleExecutor(Executor):
                 self.pool_waiting()
             LOGGER.debug("[%s]: Finnished", time.time())
 
-    @property
     def active_systems(
         self, systems: Mapping[str, System],
     ) -> Mapping[str, Tuple[System, SystemState]]:
@@ -107,7 +107,7 @@ class SimpleExecutor(Executor):
         for name, op in self.stopped_systems.items():
             if op.ready():
                 LOGGER.debug("[%s][World]: Resuming system %s", time.time(), name)
-                res = self.systems[name][1].send(op.get())
+                res = self.systems[name].send(op.get())
                 if self.match_yield(name, res):
                     resume.append(name)
         for name in resume:

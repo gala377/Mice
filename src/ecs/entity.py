@@ -4,11 +4,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import (
     Union,
-    NewType,
     Type,
     Sequence,
-    Mapping,
     Optional,
+    MutableMapping,
+    MutableSequence,
 )
 
 from ecs.component import Component
@@ -17,8 +17,8 @@ from ecs.component import Component
 @dataclass
 class GenId:
 
-    identifier: int = 0
-    generation: int = 0
+    id: int = 0
+    gen: int = 0
 
 
 @dataclass
@@ -45,7 +45,7 @@ class Storage(ABC):
         ...
 
     @abstractmethod
-    def get_component(self, comp: Type[Component]) -> Sequence[Type[Component]]:
+    def get_component(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
         ...
 
     @abstractmethod
@@ -62,7 +62,7 @@ class SOAStorage(Storage):
     TODO: Generational id reaasignment
     """
 
-    components = Mapping[Type[Component], Sequence[Component]]
+    components: MutableMapping[Type[Component], MutableSequence[Optional[Component]]]
 
     def __init__(self):
         self.components = {}
@@ -75,10 +75,10 @@ class SOAStorage(Storage):
         self.components[comp] = []
 
     def create_entity(self, comps: Sequence[Component]) -> Entity:
-        id = GenId(identifier=self.last_id)
+        id = GenId(id=self.last_id)
         self.last_id += 1
         for comp in comps:
-            self.components[comp].append(comp)
+            self.components[type(comp)].append(comp)
 
         lists_to_resize = [
             val for key, val in self.components.items() if key not in comps
@@ -93,15 +93,17 @@ class SOAStorage(Storage):
 
     def get_entity(self, id: GenId) -> Optional[Entity]:
         if id.id in self.free_ids:
-            return
-        components = []
+            return None
+        components: MutableSequence[Component] = []
         for _, val in self.components.items():
             if len(val) < id.id:
-                return
-            components.append(val[id.id])
-        return Entity(id, components)
+                return None
+            comp = val[id.id]
+            if comp is not None:
+                components.append(comp)
+        return Entity(id, components, weakref.proxy(self))
 
-    def get_component(self, comp: Type[Component]) -> Sequence[Component]:
+    def get_component(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
         comps = self.components.get(comp, default=[])
         comps = [c for i, c in enumerate(comps) if i not in self.free_ids]
         return comps

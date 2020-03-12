@@ -1,33 +1,15 @@
-import time
-import multiprocessing as mp
+from typing import Mapping
 
-from multiprocessing.pool import AsyncResult
-from typing import (
-    Iterable,
-    Mapping,
-    Tuple,
-    Iterator,
-    Sequence,
-    Callable,
-    Any,
-)
-
-import ecs
-from ecs.executor import Executor
-from ecs.system import (
+from ecs.executor import (
+    Executor,
     System,
-    YieldKind,
-    AsyncWait,
-    ok,
 )
 from ecs import entity
-
-SystemState = Tuple[System, Iterator[YieldKind]]
 
 
 class World:
 
-    systems: Mapping[str, SystemState]
+    systems: Mapping[str, System]
     entity_storage: entity.Storage
     executor: Executor
 

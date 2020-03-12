@@ -2,18 +2,10 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from typing import (
-    NewType,
-    Iterator,
-    Iterable,
-    Callable,
-    Any,
-    Mapping,
-    Tuple,
-)
+from typing import Iterator
 
 from ecs import entity
-from executor import ResumePolicy
+from ecs.executor import ResumePolicy
 
 
 class System(ABC):

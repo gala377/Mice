@@ -4,10 +4,7 @@ from ecs.system import (
     System,
     GeneratorSystem,
 )
-from ecs.executor import (
-    AsyncWait,
-    ResumePolicy,
-)
+from ecs.executor import AsyncWait
 
 
 class Wait(System):
