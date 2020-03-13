@@ -23,5 +23,5 @@ class Time:
         if self.last_frame == 0:
             self.last_frame = time.time()
         now = time.time()
-        self.delta = self.last_frame - now
+        self.delta = now - self.last_frame
         self.last_frame = now
