@@ -28,4 +28,4 @@ class Defer(ResumePolicy):
     ...
 
 
-defer = Defer
+defer = Defer()
