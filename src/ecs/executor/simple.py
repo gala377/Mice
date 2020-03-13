@@ -48,9 +48,9 @@ class SimpleExecutor(Executor):
             if len(self.stopped_systems) > 0:
                 self.pool_waiting()
             LOGGER.debug("[%s]: Finnished", time.time())
-            for name in self.defered_systems:
-                next(self.systems[name][1])
-            self.defered_systems.clear()
+        for name in self.defered_systems:
+            next(self.systems[name])
+        self.defered_systems.clear()
 
     def active_systems(
         self, systems: Mapping[str, System],
@@ -73,7 +73,7 @@ class SimpleExecutor(Executor):
             self.async_wait(system_name, yieldk.func, *yieldk.args, **yieldk.kwargs)
             return False
         if isinstance(yieldk, Defer):
-            self.defered_systems.append(str)
+            self.defered_systems.append(system_name)
             return False
         return True
 

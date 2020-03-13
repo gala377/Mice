@@ -37,6 +37,6 @@ class DrawImages(GeneratorSystem):
             drawable = zip(self.entity_storage[Image], self.entity_storage[Transform])
             drawable = filter(all, drawable)
             for img, trans in drawable:
-                img.rect.center = (trans.x, trans.y)
-                window.display.blit(img.img, img.rect)
+                img.rect.center = (trans.x, trans.y)  # type: ignore
+                window.display.blit(img.img, img.rect)  # type: ignore
             yield None

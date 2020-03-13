@@ -7,6 +7,14 @@ from ecs.system import (
 from ecs.executor.policy import AsyncWait
 
 
+class UpdateTime(GeneratorSystem):
+
+    time_resource_name: str
+
+    def __init__(self, time_res_name: str):
+        self.time_resource_name = time_res_name
+
+
 class Wait(SimpleSystem):
 
     wait_time: float
