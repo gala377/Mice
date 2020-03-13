@@ -1,75 +1,32 @@
-from abc import (
-    ABC,
-    abstractmethod,
-)
+import logging
 import time
 import multiprocessing as mp
-import logging
-import multiprocessing as mc
+from typing import MutableMapping, Mapping, Tuple, Callable, Any, Optional
 from multiprocessing.pool import AsyncResult
-from typing import (
-    Mapping,
-    MutableMapping,
-    Tuple,
-    Callable,
-    Any,
-    Generator,
-)
 
-from ecs.system import System
+from ecs.system import System, RunningSystem
+from ecs.executor.abc import Executor
+from ecs.executor.policy import ResumePolicy, AsyncWait
 from ecs import entity
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-class ResumePolicy:
-    ...
-
-
-class AsyncWait(ResumePolicy):
-
-    # should be Callable[..., Any] but mypy thinks its a method
-    # and doesn't allow any assignments
-    func: Any
-    args: Tuple[Any, ...]
-    kwargs: Mapping[str, Any]
-
-    def __init__(self, func: Callable[..., Any], *args: Any, **kwargs: Any):
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-
-
-class Executor(ABC):
-    @abstractmethod
-    def run_iteration(
-        self, systems: Mapping[str, System], entity_storage: entity.Storage,
-    ) -> None:
-        ...
-
-
-SystemState = Generator[ResumePolicy, Any, Any]
-
-
 class SimpleExecutor(Executor):
 
-    systems: MutableMapping[str, SystemState]
+    systems: MutableMapping[str, RunningSystem]
     stopped_systems: MutableMapping[str, AsyncResult]
-    pool: mc.pool.Pool
+    pool: mp.pool.Pool
 
-    def __init__(self):
-        super().__init__()
-        self.systems = {}
+    def __init__(self, storage: entity.Storage, systems: Mapping[str, System]):
+        self.systems = {n: s.init(storage) for n, s in systems.items()}
         self.stopped_systems = {}
         self.pool = mp.Pool()
 
-    def run_iteration(
-        self, systems: Mapping[str, System], entity_storage: entity.Storage,
-    ):
+    def run_iteration(self, systems: Mapping[str, System]):
         for name, (system, iterator) in self.active_systems(systems).items():
             LOGGER.debug("[%s]: Running %s system.", time.time(), name)
-            system.update(entity_storage)
             res = next(iterator)
             self.match_yield(name, res)
             if len(self.stopped_systems) > 0:
@@ -78,14 +35,14 @@ class SimpleExecutor(Executor):
 
     def active_systems(
         self, systems: Mapping[str, System],
-    ) -> Mapping[str, Tuple[System, SystemState]]:
+    ) -> Mapping[str, Tuple[System, RunningSystem]]:
         return {
             name: (instance, self.systems[name])
             for name, instance in systems.items()
             if name not in self.stopped_systems
         }
 
-    def match_yield(self, system_name: str, yieldk: ResumePolicy) -> bool:
+    def match_yield(self, system_name: str, yieldk: Optional[ResumePolicy]) -> bool:
         """
         Schedules system based on the yielded value.
         

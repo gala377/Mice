@@ -5,9 +5,14 @@ from ecs.entity import SOAStorage
 
 
 def main():
-    sys_l = [systems.HelloWorld(1), systems.WaitAsync(5.0), systems.Wait(1.0)]
-    sys_d = {s.__class__.__name__: s for s in sys_l}
-    w = World(storage=SOAStorage(), systems=sys_d, executor=SimpleExecutor())
+    w = World(storage=SOAStorage())
+
+    w.register(systems.HelloWorld(1))
+    w.register(systems.Wait(1.0))
+    w.register(systems.WaitAsync(5.0))
+
+    w.register_executor(SimpleExecutor)
+
     w.start()
 
 

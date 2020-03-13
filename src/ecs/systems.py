@@ -1,13 +1,13 @@
 import time
 from typing import TypeVar
 from ecs.system import (
-    System,
     GeneratorSystem,
+    SimpleSystem,
 )
-from ecs.executor import AsyncWait
+from ecs.executor.policy import AsyncWait
 
 
-class Wait(System):
+class Wait(SimpleSystem):
 
     wait_time: float
 

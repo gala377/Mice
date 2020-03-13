@@ -1,3 +1,4 @@
+from typing import Any
+
 # A marker class
-class Component:
-    ...
+Component = Any

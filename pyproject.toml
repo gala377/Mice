@@ -11,6 +11,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pygame = "^1.9.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -24,9 +25,9 @@ rope = "^0.16.0"
 [tool.black]
 line-lenght = 79
 
+[tool.poetry.scripts]
+x = 'x:main'
 [build-system]
 requires = ["poetry>=1.0.3"]
 build-backend = "poetry.masonry.api"
 
-[tool.poetry.scripts]
-x = 'x:main'

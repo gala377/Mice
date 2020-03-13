@@ -1,29 +1,55 @@
-from abc import (
-    ABC,
-    abstractmethod,
-)
-from typing import Iterator
+from abc import abstractmethod, ABC
+from typing import Generator, Any, Optional
 
 from ecs import entity
-from ecs.executor import ResumePolicy
+from ecs.executor.policy import ResumePolicy
+
+
+RunningSystem = Generator[Optional[ResumePolicy], Any, Any]
 
 
 class System(ABC):
-    def update(self, storage: entity.Storage):
-        return
 
-    def __iter__(self) -> Iterator[ResumePolicy]:
-        return self
+    entity_storage: entity.Storage
+
+    def init(self, storage: entity.Storage) -> RunningSystem:
+        self.entity_storage = storage
+        return self.run()
 
     @abstractmethod
-    def __next__(self) -> ResumePolicy:
+    def run(self) -> RunningSystem:
         ...
 
 
 class GeneratorSystem(System):
+    def run(self):
+        return iter(self)
+
     @abstractmethod
-    def __iter__(self) -> Iterator[ResumePolicy]:
+    def __iter__(self) -> RunningSystem:
         ...
 
-    def __next__(self):
-        return None
+
+class SimpleSystem(GeneratorSystem, RunningSystem):
+    def __iter__(self) -> RunningSystem:
+        return self
+
+    @abstractmethod
+    def __next__(self) -> Optional[ResumePolicy]:
+        ...
+
+    def send(self, val: Any):
+        raise NotImplementedError("SimpleSytem doesn't implement send method")
+
+    def throw(self, typ, val=None, tb=None):
+        err = NotImplementedError("SimpleSystem doesn't implement throw method")
+        if val is None:
+            if tb is None:
+                raise err from typ
+            val = typ()
+        if tb is not None:
+            val = val.with_traceback(tb)
+        raise err from val
+
+    def close(self):
+        raise NotImplementedError("SimpleSystem doesn't implement close method")
