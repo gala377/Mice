@@ -1,4 +1,4 @@
-from typing import MutableMapping, Sequence, Optional, Type
+from typing import MutableMapping, Sequence, Optional, Type, Callable
 from functools import singledispatchmethod  # type: ignore
 
 from ecs.executor import Executor
@@ -9,6 +9,12 @@ from ecs.component import Component
 
 
 class World:
+
+    """
+    Order of registering:
+        Executor has to go last
+        Components have to be registered before resources
+    """
 
     systems: MutableMapping[str, System]
     entity_storage: entity.Storage
@@ -21,12 +27,16 @@ class World:
         self.systems = {}
         self.entity_storage = storage
         self.executor = None
+        self.resources = {}
 
     def start(self):
         try:
             self.loop()
         finally:
             print("STOPPING SYSTEM...")
+            if self.executor is not None:
+                self.executor.stop_all()
+            print("STOPPED ALL SYSTEMS...")
 
     def loop(self):
         if self.executor is None:
@@ -35,7 +45,7 @@ class World:
             self.executor.run_iteration(self.systems)
 
     def register_executor(self, executor: Type[Executor]):
-        exc = executor(self.entity_storage, self.systems)
+        exc = executor(self.entity_storage, self.systems, self.resources)
         self.executor = exc
 
     @singledispatchmethod
@@ -55,5 +65,11 @@ class World:
         en = self.entity_storage.create_entity(components)
         self.resources[name] = en
 
+    def register_component(self, comp: Type[Component]):
+        self.entity_storage.register(comp)
+
     def get_resource(self, name: str) -> Optional[Entity]:
         return self.resources.get(name)
+
+    def plug(self, func: Callable):
+        func()

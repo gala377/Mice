@@ -22,3 +22,10 @@ class AsyncWait(ResumePolicy):
         self.func = func
         self.args = args
         self.kwargs = kwargs
+
+
+class Defer(ResumePolicy):
+    ...
+
+
+defer = Defer

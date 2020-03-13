@@ -29,7 +29,8 @@ class Entity:
     _storage: weakref.ProxyType  # Storage weakref
 
     def __del__(self):
-        self._storage.remove_entity(self.id)
+        if self._storage is not None:
+            self._storage.remove_entity(self.id)
 
 
 StorageKey = Union[GenId, Type[Component]]
@@ -55,6 +56,9 @@ class Storage(ABC):
     @abstractmethod
     def remove_entity(self, id: GenId):
         ...
+
+    def __getitem__(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
+        return self.get_component(comp)
 
 
 class SOAStorage(Storage):
@@ -104,6 +108,6 @@ class SOAStorage(Storage):
         return Entity(id, components, weakref.proxy(self))
 
     def get_component(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
-        comps = self.components.get(comp, default=[])
+        comps = self.components.get(comp, [])
         comps = [c for i, c in enumerate(comps) if i not in self.free_ids]
         return comps

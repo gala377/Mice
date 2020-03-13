@@ -6,6 +6,7 @@ license = "MIT"
 authors = ["Rafał Galczak <r.galczak@gmail.com>"]
 packages = [ 
     { include = "mice", from = "src" },
+    { include = "pygame_plugin", from = "src" },
     { include = "ecs", from = "src" },
 ]
 

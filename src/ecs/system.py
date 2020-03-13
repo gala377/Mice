@@ -1,7 +1,8 @@
 from abc import abstractmethod, ABC
-from typing import Generator, Any, Optional
+from typing import Generator, Any, Optional, Mapping
 
 from ecs import entity
+from ecs.entity import Entity
 from ecs.executor.policy import ResumePolicy
 
 
@@ -11,9 +12,13 @@ RunningSystem = Generator[Optional[ResumePolicy], Any, Any]
 class System(ABC):
 
     entity_storage: entity.Storage
+    resources: Mapping[str, Entity]
 
-    def init(self, storage: entity.Storage) -> RunningSystem:
+    def init(
+        self, storage: entity.Storage, resources: Mapping[str, Entity]
+    ) -> RunningSystem:
         self.entity_storage = storage
+        self.resources = resources
         return self.run()
 
     @abstractmethod

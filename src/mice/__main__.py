@@ -1,0 +1,56 @@
+from ecs.world import World
+from ecs.executor import SimpleExecutor
+from ecs.entity import SOAStorage
+from ecs.component import Transform
+import ecs
+
+import pygame
+import pygame_plugin
+
+
+class MoveBall(ecs.system.GeneratorSystem):
+    def __iter__(self):
+        ball = self.resources["BALL"]
+        width = 720
+        height = 480
+        [pos] = filter(lambda x: isinstance(x, Transform), ball.components)
+        speed = [2, 2]
+        # print(f"GOT BALLS POSITION ITS {pos}")
+        yield None
+        while True:
+            pos.x += speed[0]
+            pos.y += speed[1]
+            if pos.x < 0 or pos.x > width:
+                speed[0] = -speed[0]
+            if pos.y < 0 or pos.y > height:
+                speed[1] = -speed[1]
+            yield None
+
+
+def main():
+    w = World(storage=SOAStorage())
+
+    w.register(pygame_plugin.systems.WindowEvents())
+    w.register(pygame_plugin.systems.DrawWindow())
+    w.register(pygame_plugin.systems.DrawImages())
+    w.register(MoveBall())
+
+    w.register_component(pygame_plugin.components.Window)
+    w.register_component(pygame_plugin.components.Image)
+    w.register_component(Transform)
+
+    w.plug(lambda: pygame.init())
+
+    w.register("WINDOW", [pygame_plugin.components.Window(720, 480)])
+    w.register(
+        "BALL",
+        [pygame_plugin.components.Image("resources/intro_ball.gif"), Transform(0, 0)],
+    )
+
+    w.register_executor(SimpleExecutor)
+
+    w.start()
+
+
+if __name__ == "__main__":
+    main()

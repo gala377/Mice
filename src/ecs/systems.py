@@ -19,6 +19,9 @@ class Wait(SimpleSystem):
         time.sleep(self.wait_time)
         print("Waky waky")
 
+    def close(self):
+        ...
+
 
 T = TypeVar("T")
 

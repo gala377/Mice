@@ -6,9 +6,18 @@ from ecs import entity
 
 class Executor(ABC):
     @abstractmethod
-    def __init__(self, storage: entity.Storage, systems: Mapping[str, System]):
+    def __init__(
+        self,
+        storage: entity.Storage,
+        systems: Mapping[str, System],
+        resources: Mapping[str, entity.Entity],
+    ):
         ...
 
     @abstractmethod
     def run_iteration(self, systems: Mapping[str, System]) -> None:
+        ...
+
+    @abstractmethod
+    def stop_all(self):
         ...
