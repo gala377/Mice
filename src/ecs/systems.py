@@ -7,6 +7,22 @@ from ecs.system import (
 from ecs.executor.policy import AsyncWait
 
 
+class UpdateTime(GeneratorSystem):
+
+    res_name: str
+
+    def __init__(self, res_name: str):
+        self.resources = res_name
+
+    def __iter__(self):
+        [timer] = self.resources[self.res_name].components
+        timer.update()
+        yield None
+        while True:
+            timer.update()
+            yield None
+
+
 class Wait(SimpleSystem):
 
     wait_time: float

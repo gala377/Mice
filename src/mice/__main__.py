@@ -1,7 +1,7 @@
 from ecs.world import World
 from ecs.executor import SimpleExecutor
 from ecs.entity import SOAStorage
-from ecs.component import Transform
+from ecs.component import Transform, Time
 import ecs
 
 import pygame
@@ -34,10 +34,12 @@ def main():
     w.register(pygame_plugin.systems.DrawWindow())
     w.register(pygame_plugin.systems.DrawImages())
     w.register(MoveBall())
+    w.register(ecs.systems.UpdateTime("TIMER"))
 
     w.register_component(pygame_plugin.components.Window)
     w.register_component(pygame_plugin.components.Image)
     w.register_component(Transform)
+    w.register_component(Time)
 
     w.plug(lambda: pygame.init())
 
@@ -45,6 +47,9 @@ def main():
     w.register(
         "BALL",
         [pygame_plugin.components.Image("resources/intro_ball.gif"), Transform(0, 0)],
+    )
+    w.register(
+        "TIMER", [Time()],
     )
 
     w.register_executor(SimpleExecutor)

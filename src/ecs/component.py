@@ -1,3 +1,5 @@
+import time
+
 from typing import Any
 from dataclasses import dataclass
 
@@ -9,3 +11,17 @@ Component = Any
 class Transform:
     x: float
     y: float
+
+
+@dataclass
+class Time:
+
+    delta: float = 0
+    last_frame: float = 0
+
+    def update(self):
+        if self.last_frame == 0:
+            self.last_frame = time.time()
+        now = time.time()
+        self.delta = self.last_frame - now
+        self.last_frame = now
