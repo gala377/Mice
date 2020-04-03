@@ -23,6 +23,7 @@ TODO
 
 Global
     - Keepachangelog.
+    - Fix CI.
 
 ECS
     - Components queries instead of pulling the world object.
