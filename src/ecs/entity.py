@@ -62,9 +62,6 @@ class Storage(ABC):
 
 
 class SOAStorage(Storage):
-    """
-    TODO: Generational id reaasignment
-    """
 
     components: MutableMapping[Type[Component], MutableSequence[Optional[Component]]]
 
@@ -83,7 +80,9 @@ class SOAStorage(Storage):
         self.last_id += 1
         for comp in comps:
             self.components[type(comp)].append(comp)
-
+        print(
+            f"Creating entity with componetnts {[map(lambda x: x.__class__.__name__, comps)]}"
+        )
         lists_to_resize = [
             val for key, val in self.components.items() if key not in comps
         ]

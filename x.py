@@ -13,7 +13,7 @@ def _stop_on_failure(process: CompletedProcess):
         print(f"[{' '.join(process.args)}] Process returned non zero return code")
         print(f"[{' '.join(process.args)}] Captured output:\n\n")
         print(process.stdout)
-        sys,exit(1)
+        sys.exit(1)
 
 
 def _run(cmd: str, /, *args: str, capture_std=True):
@@ -48,6 +48,12 @@ def build(*, black: bool = True, flake: bool = True, mypy: bool = False):
 @app.command()
 def update():
     _run("poetry", "update", capture_std=False)
+
+
+@app.command()
+def example():
+    _run("poetry", "build", capture_std=True)
+    _run("python", "src/example", capture_std=False)
 
 
 def main():

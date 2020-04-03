@@ -6,8 +6,10 @@ license = "MIT"
 authors = ["Rafał Galczak <r.galczak@gmail.com>"]
 packages = [ 
     { include = "mice", from = "src" },
+    { include = "mice_common", from = "src" },
     { include = "pygame_plugin", from = "src" },
     { include = "ecs", from = "src" },
+    { include = "example", from ="src" },
 ]
 
 [tool.poetry.dependencies]
@@ -28,6 +30,7 @@ line-lenght = 79
 
 [tool.poetry.scripts]
 x = 'x:main'
+
 [build-system]
 requires = ["poetry>=1.0.3"]
 build-backend = "poetry.masonry.api"

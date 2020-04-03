@@ -1,7 +1,7 @@
 from typing import MutableMapping, Sequence, Optional, Type, Callable
 from functools import singledispatchmethod  # type: ignore
 
-from ecs.executor import Executor
+from ecs.executor.abc import Executor
 from ecs.system import System
 from ecs import entity
 from ecs.entity import Entity
