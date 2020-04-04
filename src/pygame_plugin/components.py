@@ -4,8 +4,14 @@ from typing import Any, MutableMapping
 
 
 class Window:
+
+    width: int
+    height: int
+
     def __init__(self, width: int, height: int):
         self.display = pygame.display.set_mode((width, height))
+        self.width = width
+        self.height = height
 
 
 class Image:

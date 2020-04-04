@@ -42,7 +42,7 @@ class Game:
         wb.add_component(Time)
 
     def _add_common_systems(self, wb: WorldBuilder):
-        wb.add_system(pygame_plugin.systems.DrawWindow(self.WINDOW_RES))
+        wb.add_system(pygame_plugin.systems.DrawWindow(self.WINDOW_RES), add_front=True)
         wb.add_system(pygame_plugin.systems.WindowEvents())
         wb.add_system(pygame_plugin.systems.DrawImages(self.WINDOW_RES))
         wb.add_system(UpdateTime(self.TIMER_RES))

@@ -9,6 +9,7 @@ from typing import (
     Optional,
     MutableMapping,
     MutableSequence,
+    MutableSet,
 )
 
 from ecs.component import Component
@@ -64,6 +65,7 @@ class Storage(ABC):
 class SOAStorage(Storage):
 
     components: MutableMapping[Type[Component], MutableSequence[Optional[Component]]]
+    free_ids: MutableSet[int]
 
     def __init__(self):
         self.components = {}
@@ -80,9 +82,6 @@ class SOAStorage(Storage):
         self.last_id += 1
         for comp in comps:
             self.components[type(comp)].append(comp)
-        print(
-            f"Creating entity with componetnts {[map(lambda x: x.__class__.__name__, comps)]}"
-        )
         lists_to_resize = [
             val for key, val in self.components.items() if key not in comps
         ]
@@ -93,6 +92,10 @@ class SOAStorage(Storage):
 
     def remove_entity(self, id: GenId):
         self.free_ids.add(id.id)
+        for _, val in self.components.items():
+            if len(val) < id.id:
+                raise RuntimeError("Trying to free not allocated entity")
+            val[id.id] = None
 
     def get_entity(self, id: GenId) -> Optional[Entity]:
         if id.id in self.free_ids:
