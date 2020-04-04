@@ -35,7 +35,7 @@ class GeneratorSystem(System):
         ...
 
 
-class SimpleSystem(GeneratorSystem, RunningSystem):
+class IteratorSystem(GeneratorSystem, RunningSystem):
     def __iter__(self) -> RunningSystem:
         return self
 

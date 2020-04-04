@@ -3,7 +3,7 @@
 from ecs.system import (
     RunningSystem,
     System,
-    SimpleSystem,
+    IteratorSystem,
     GeneratorSystem,
 )
 

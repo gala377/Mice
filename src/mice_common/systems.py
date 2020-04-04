@@ -2,7 +2,7 @@ import time
 from typing import TypeVar, Mapping, Sequence, Any
 from ecs.system import (
     GeneratorSystem,
-    SimpleSystem,
+    IteratorSystem,
 )
 from ecs.executor.policy import AsyncWait
 
@@ -30,7 +30,7 @@ class UpdateTime(GeneratorSystem):
     default_kwargs: Mapping[str, Any] = {}
 
 
-class Wait(SimpleSystem):
+class Wait(IteratorSystem):
 
     wait_time: float
 
