@@ -26,7 +26,7 @@ class UpdateTime(GeneratorSystem):
             timer.update()
             yield None
 
-    default_args: Sequence[Any] = ["TIMER"]
+    default_args: Sequence[Any] = ["timer"]
     default_kwargs: Mapping[str, Any] = {}
 
 

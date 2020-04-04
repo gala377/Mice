@@ -1,25 +1,20 @@
 from typing import Iterator
-
-from ecs.system import GeneratorSystem, RunningSystem
-from example.components import Grid, DebugView
-from mice import Game
-
-from example.resources import GRID_RES_NAME
-
-
-from mice_common.autoregister import register
-
-
 import pygame
 
+from mice import Game
+from mice import system
+from mice.system_helpers import GeneratorSystem, RunningSystem
 
-@register
+from example.components import Grid, DebugView
+
+
+@system
 class GridView(GeneratorSystem):
 
     window_name: str
     grid_name: str
 
-    default_args = [Game.WINDOW_RES, GRID_RES_NAME]
+    default_args = [Game.WINDOW_RES, "grid"]
 
     def __init__(self, wn: str, gn: str):
         super().__init__()

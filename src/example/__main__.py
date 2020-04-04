@@ -1,15 +1,12 @@
 from typing import Tuple, Sequence
 
-from mice import Game, WorldBuilder
-from ecs.system import GeneratorSystem
-from pygame_plugin.components import Image
-from mice_common.components import Transform
+from mice import Game, WorldBuilder, register
+from mice.system_helpers import GeneratorSystem
+from mice.components import Image, Transform
 
 # flake8: noqa
 import example.systems
-
-from example.resources import add_resources
-from mice_common.autoregister import register
+import example.resources
 
 
 @register
@@ -23,7 +20,7 @@ class MoveBall(GeneratorSystem):
         self.speed = speed
 
     def __iter__(self):
-        ball = self.resources["BALL"]
+        ball = self.resources["ball"]
         width = 720
         height = 480
         [pos] = filter(lambda x: isinstance(x, Transform), ball.components)
@@ -43,9 +40,6 @@ class MoveBall(GeneratorSystem):
 
 def main():
     w = WorldBuilder()
-    w.add_resource("BALL", [Image("resources/intro_ball.gif"), Transform(0, 0)])
-
-    add_resources(w)
     game = Game(w, (720, 480))
     game.start()
 

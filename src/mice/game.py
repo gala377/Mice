@@ -7,15 +7,18 @@ from ecs.entity import SOAStorage
 from ecs.executor.simple import SimpleExecutor
 from ecs.world import World
 
-from mice_common.components import Time
-from mice_common.autoregister import ComponentRepository, SystemsRepository
+from mice_common.autoregister import (
+    ComponentRepository,
+    SystemsRepository,
+    ResourceRepository,
+)
 
 from mice.world_builder import WorldBuilder
 
 
 class Game:
 
-    TIMER_RES = "TIMER"
+    TIMER_RES = "timer"
     WINDOW_RES = "WINDOW"
 
     _world: World
@@ -30,10 +33,13 @@ class Game:
         self._world = wb.build()
 
     def _add_common_resources(self, wb: WorldBuilder, ws: Tuple[int, int]):
-        wb.add_resource(self.TIMER_RES, [Time()])
         wb.add_resource(
             self.WINDOW_RES, [pygame_plugin.components.Window(ws[0], ws[1])]
         )
+        print("Registering components...")
+        for rn, rc in ResourceRepository.resources:
+            print(f"Registering resource {rn}")
+            wb.add_resource(rn, rc)
 
     def _add_common_components(self, wb: WorldBuilder):
         for c in ComponentRepository.components:

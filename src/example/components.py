@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from mice_common.autoregister import register
+from mice import register
 
 
 @register

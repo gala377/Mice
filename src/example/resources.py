@@ -1,13 +1,14 @@
-from mice import WorldBuilder
+from mice import resource
+from mice.components import Image, Transform
+
 from example.components import Grid, DebugView
 
 
-def add_resources(w: WorldBuilder):
-    add_grid_resource(w)
+@resource
+class grid:
+    components = [Grid(25), DebugView()]
 
 
-GRID_RES_NAME = "GRID"
-
-
-def add_grid_resource(w: WorldBuilder):
-    w.add_resource(GRID_RES_NAME, [Grid(100), DebugView()])
+@resource
+class ball:
+    components = [Image("resources/intro_ball.gif"), Transform(0, 0)]
