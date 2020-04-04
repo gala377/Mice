@@ -2,14 +2,24 @@ from typing import Iterator
 
 from ecs.system import GeneratorSystem, RunningSystem
 from example.components import Grid, DebugView
+from mice import Game
+
+from example.resources import GRID_RES_NAME
+
+
+from mice_common.autoregister import register
+
 
 import pygame
 
 
+@register
 class GridView(GeneratorSystem):
 
     window_name: str
     grid_name: str
+
+    default_args = [Game.WINDOW_RES, GRID_RES_NAME]
 
     def __init__(self, wn: str, gn: str):
         super().__init__()
@@ -29,14 +39,14 @@ class GridView(GeneratorSystem):
         yield None
         while True:
             for grid in self.grids:
-                for i in range((window.height // grid.size)+1):
+                for i in range((window.height // grid.size) + 1):
                     pygame.draw.line(
                         window.display,
                         (0, 255, 0),
                         (0, i * grid.size),
                         (window.width, i * grid.size),
                     )
-                for i in range((window.width // grid.size)+1):
+                for i in range((window.width // grid.size) + 1):
                     pygame.draw.line(
                         window.display,
                         (0, 0, 255),

@@ -1,6 +1,9 @@
+from typing import Sequence, Mapping, Any
+
 from ecs.system import GeneratorSystem, RunningSystem
 from ecs.executor.policy import defer
 from mice_common.components import Transform
+from mice_common.autoregister import register
 
 import sys
 import pygame
@@ -8,6 +11,7 @@ import pygame
 from pygame_plugin.components import Image
 
 
+@register
 class WindowEvents(GeneratorSystem):
     def __iter__(self) -> RunningSystem:
         yield None
@@ -36,9 +40,12 @@ class DrawWindow(GeneratorSystem):
             yield None
 
 
+@register
 class DrawImages(GeneratorSystem):
 
     window_name: str
+    default_args: Sequence[str] = ["WINDOW"]
+    default_kwargs: Mapping[str, Any] = {}
 
     def __init__(self, window_name: str):
         super().__init__()

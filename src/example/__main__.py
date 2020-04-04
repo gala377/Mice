@@ -1,18 +1,23 @@
-from typing import Tuple
+from typing import Tuple, Sequence
 
 from mice import Game, WorldBuilder
 from ecs.system import GeneratorSystem
 from pygame_plugin.components import Image
 from mice_common.components import Transform
 
-from example.resources import add_resources, GRID_RES_NAME
-from example.components import DebugView, Grid
-from example.systems import GridView
+# flake8: noqa
+import example.systems
+
+from example.resources import add_resources
+from mice_common.autoregister import register
 
 
+@register
 class MoveBall(GeneratorSystem):
 
     speed: Tuple[float, float]
+
+    default_args: Sequence[Tuple[float, float]] = [(500, 500)]
 
     def __init__(self, speed: Tuple[float, float]):
         self.speed = speed
@@ -39,14 +44,8 @@ class MoveBall(GeneratorSystem):
 def main():
     w = WorldBuilder()
     w.add_resource("BALL", [Image("resources/intro_ball.gif"), Transform(0, 0)])
-    w.add_system(MoveBall((500, 550)))
 
     add_resources(w)
-
-    w.add_system(GridView(Game.WINDOW_RES, GRID_RES_NAME))
-    w.add_component(Grid)
-    w.add_component(DebugView)
-
     game = Game(w, (720, 480))
     game.start()
 
