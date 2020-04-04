@@ -35,6 +35,21 @@ class GeneratorSystem(System):
         ...
 
 
+class SimpleSystem(GeneratorSystem):
+
+    def start(self): ...
+
+    @abstractmethod
+    def update(self) -> RunningSystem:
+        ...
+
+    def __iter__(self) -> RunningSystem:
+        self.start()
+        yield None
+        while True:
+            yield from self.update()
+
+
 class IteratorSystem(GeneratorSystem, RunningSystem):
     def __iter__(self) -> RunningSystem:
         return self

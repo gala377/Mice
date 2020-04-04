@@ -5,6 +5,7 @@ from ecs.system import (
     System,
     IteratorSystem,
     GeneratorSystem,
+    SimpleSystem,
 )
 
 from ecs.executor.policy import (
