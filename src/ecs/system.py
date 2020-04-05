@@ -5,7 +5,6 @@ from ecs import entity
 from ecs.entity import Entity
 from ecs.executor.policy import ResumePolicy
 
-
 RunningSystem = Generator[Optional[ResumePolicy], Any, Any]
 
 
@@ -36,8 +35,8 @@ class GeneratorSystem(System):
 
 
 class SimpleSystem(GeneratorSystem):
-
-    def start(self): ...
+    def start(self):
+        ...
 
     @abstractmethod
     def update(self) -> RunningSystem:

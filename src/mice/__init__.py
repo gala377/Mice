@@ -5,6 +5,7 @@ __version__ = "0.1.0"
 
 from ecs.component import Component
 from ecs.system import System
+from ecs.genid import GenId
 
 from mice.game import Game
 from mice.world_builder import WorldBuilder

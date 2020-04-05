@@ -3,23 +3,15 @@ import weakref
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import (
-    Union,
     Type,
     Sequence,
     Optional,
     MutableMapping,
     MutableSequence,
-    MutableSet,
 )
 
 from ecs.component import Component
-
-
-@dataclass
-class GenId:
-
-    id: int = 0
-    gen: int = 0
+from ecs.genid import GenId, Allocator, NotEnoughSpace
 
 
 @dataclass
@@ -27,14 +19,11 @@ class Entity:
 
     id: GenId
     components: Sequence[Component]
-    _storage: weakref.ProxyType  # Storage weakref
+    _storage: weakref.ReferenceType  # Storage weakref
 
     def __del__(self):
-        if self._storage is not None:
-            self._storage.remove_entity(self.id)
-
-
-StorageKey = Union[GenId, Type[Component]]
+        if self._storage() is not None:
+            self._storage().remove_entity(self.id)  # type: ignore
 
 
 class Storage(ABC):
@@ -65,51 +54,55 @@ class Storage(ABC):
 class SOAStorage(Storage):
 
     components: MutableMapping[Type[Component], MutableSequence[Optional[Component]]]
-    free_ids: MutableSet[int]
+    allocator: Allocator
+
+    INITIAL_CAPACITY: int = 10
 
     def __init__(self):
         self.components = {}
-        self.free_ids = set()
-        self.last_id = 0
+        self.allocator = Allocator(capacity=self.INITIAL_CAPACITY)
 
     def register(self, comp: Type[Component]):
         if comp in self.components:
             return
-        self.components[comp] = []
+        self.components[comp] = [None]*self.INITIAL_CAPACITY
 
     def create_entity(self, comps: Sequence[Component]) -> Entity:
-        id = GenId(id=self.last_id)
-        self.last_id += 1
-        for comp in comps:
-            self.components[type(comp)].append(comp)
-        lists_to_resize = [
-            val for key, val in self.components.items() if key not in comps
-        ]
-        for val in lists_to_resize:
-            val.append(None)
-
-        return Entity(id, comps, weakref.proxy(self))
+        try:
+            idx = self.allocator.allocate()
+            for c in comps:
+                self.components[type(c)][idx.id] = c
+            entity = self.get_entity(idx)
+            if entity is None:
+                raise RuntimeError("Couldn't fetch just allocated entity")
+            return entity
+        except NotEnoughSpace:
+            resized_by = self.allocator.autoresize()
+            print(f"Resized by {resized_by}")
+            self._resize_components_arrays(resized_by)
+            return self.create_entity(comps)
 
     def remove_entity(self, id: GenId):
-        self.free_ids.add(id.id)
-        for _, val in self.components.items():
-            if len(val) < id.id:
-                raise RuntimeError("Trying to free not allocated entity")
-            val[id.id] = None
+        if self.allocator.is_valid(id):
+            for _, array in self.components.items():
+                array[id.id] = None
+            self.allocator.deallocate(id)
 
     def get_entity(self, id: GenId) -> Optional[Entity]:
-        if id.id in self.free_ids:
+        if not self.allocator.is_valid(id):
             return None
-        components: MutableSequence[Component] = []
-        for _, val in self.components.items():
-            if len(val) < id.id:
-                return None
-            comp = val[id.id]
-            if comp is not None:
-                components.append(comp)
-        return Entity(id, components, weakref.proxy(self))
+        comps = [
+            array[id.id]
+            for _, array in self.components.items()
+            if array[id.id] is not None
+        ]
+        return Entity(id, comps, weakref.ref(self))
 
     def get_component(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
         comps = self.components.get(comp, [])
-        comps = [c for i, c in enumerate(comps) if i not in self.free_ids]
+        comps = [comps[id.id] for id in self.allocator.valid_ids()]
         return comps
+
+    def _resize_components_arrays(self, by: int = 1):
+        for _, array in self.components.items():
+            array.extend(None for _ in range(by))
