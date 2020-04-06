@@ -65,7 +65,7 @@ class SOAStorage(Storage):
     def register(self, comp: Type[Component]):
         if comp in self.components:
             return
-        self.components[comp] = [None]*self.INITIAL_CAPACITY
+        self.components[comp] = [None] * self.INITIAL_CAPACITY
 
     def create_entity(self, comps: Sequence[Component]) -> Entity:
         try:

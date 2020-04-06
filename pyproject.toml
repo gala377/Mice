@@ -29,7 +29,7 @@ rope = "^0.16.0"
 line-lenght = 79
 
 [tool.poetry.scripts]
-x = 'x:main'
+x = 'scripts.x:main'
 
 [build-system]
 requires = ["poetry>=1.0.3"]
