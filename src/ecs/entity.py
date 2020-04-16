@@ -100,7 +100,6 @@ class SOAStorage(Storage):
 
     def get_component(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
         comps = self.components.get(comp, [])
-        comps = [comps[id.id] for id in self.allocator.valid_ids()]
         return comps
 
     def _resize_components_arrays(self, by: int = 1):
