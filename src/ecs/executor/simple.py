@@ -68,6 +68,10 @@ class SimpleExecutor(Executor):
         Returns:
             True if system should be scheduled for the next iteration.
             Flase if the system should be paused.
+
+        TODO:
+            Can be sped up. Instead of checking `isinstance` check
+            for tag being an int or smth.
         """
         if isinstance(yieldk, AsyncWait):
             self.async_wait(system_name, yieldk.func, *yieldk.args, **yieldk.kwargs)

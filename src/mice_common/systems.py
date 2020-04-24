@@ -1,10 +1,10 @@
-import time
-from typing import TypeVar, Mapping, Sequence, Any
-from ecs.system import (
-    GeneratorSystem,
-    IteratorSystem,
+from typing import (
+    Mapping,
+    Sequence,
+    Any,
 )
-from ecs.executor.policy import AsyncWait
+
+from ecs.system import GeneratorSystem
 
 from mice_common.autoregister import register
 
@@ -13,6 +13,8 @@ from mice_common.autoregister import register
 class UpdateTime(GeneratorSystem):
 
     res_name: str
+    default_args: Sequence[Any] = ["timer"]
+    default_kwargs: Mapping[str, Any] = {}
 
     def __init__(self, res_name: str):
         super().__init__()
@@ -25,6 +27,3 @@ class UpdateTime(GeneratorSystem):
         while True:
             timer.update()
             yield None
-
-    default_args: Sequence[Any] = ["timer"]
-    default_kwargs: Mapping[str, Any] = {}
