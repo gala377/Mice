@@ -2,10 +2,10 @@ import pygame
 
 from typing import Any, MutableMapping
 
-from mice_common.autoregister import register
+from libmice.autoregister import component
 
 
-@register
+@component
 class Window:
 
     width: int
@@ -17,7 +17,7 @@ class Window:
         self.height = height
 
 
-@register
+@component
 class Image:
 
     _cache: MutableMapping[str, Any] = {}

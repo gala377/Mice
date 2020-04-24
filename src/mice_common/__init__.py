@@ -1,7 +1,0 @@
-# flake8: noqa
-
-import mice_common.autoregister
-import mice_common.systems
-import mice_common.components
-import mice_common.resources
-import mice_common.system_helpers

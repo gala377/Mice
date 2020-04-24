@@ -23,7 +23,7 @@ class Entity:
 
     def __del__(self):
         if self._storage() is not None:
-            self._storage().remove_entity(self.id)  # type: ignore
+            self._storage().remove_entity(self.id)
 
 
 class Storage(ABC):

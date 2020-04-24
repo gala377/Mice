@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
-from mice import register
+from mice import component
 
 
-@register
+@component
 @dataclass
 class Grid:
     size: float
 
 
-@register
+@component
 class DebugView:
     ...

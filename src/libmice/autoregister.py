@@ -37,7 +37,7 @@ def register(cls: Type[Any]):
 def system(cls: Type[System]):
     default_args = getattr(cls, "default_args", [])
     default_kwargs = getattr(cls, "default_kwargs", {})
-    SystemsRepository.add(cls(*default_args, **default_kwargs))  # type: ignore
+    SystemsRepository.add(cls(*default_args, **default_kwargs))
     return cls
 
 

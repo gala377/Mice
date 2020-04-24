@@ -7,7 +7,13 @@ from ecs.entity import SOAStorage
 from ecs.executor.simple import SimpleExecutor
 from ecs.world import World
 
-from mice_common.autoregister import (
+import libmice.common.components
+import libmice.common.resources
+
+# flake8: noqa
+import libmice.common.systems
+
+from libmice.autoregister import (
     ComponentRepository,
     SystemsRepository,
     ResourceRepository,
@@ -48,7 +54,7 @@ class Game:
 
     def _add_common_systems(self, wb: WorldBuilder):
         wb.add_system(pygame_plugin.systems.DrawWindow(self.WINDOW_RES), add_front=True)
-        print("Addind systems...")
+        print("g systems...")
         for s in SystemsRepository.systems:
             print(f"Registering system {s.__class__.__name__}")
             wb.add_system(s)

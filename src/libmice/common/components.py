@@ -2,17 +2,17 @@ import time
 
 from dataclasses import dataclass
 
-from mice_common.autoregister import register
+from libmice.autoregister import component
 
 
-@register
+@component
 @dataclass
 class Transform:
     x: float
     y: float
 
 
-@register
+@component
 @dataclass
 class Time:
 

@@ -3,9 +3,7 @@ from typing import (
     Type,
     MutableSequence,
     Union,
-    Any,
     Iterator,
-    Iterable,
     Optional,
 )
 from abc import (
@@ -82,9 +80,9 @@ class Query:
         if isinstance(self.predicates, Sequence):
             it = zip(*(storage[p.comp] for p in self.predicates))
             for i, p in enumerate(self.predicates):
-                it = filter(lambda x, p=p, i=i: p.filter_func(x[i]), it)  # type: ignore
+                it = filter(lambda x, p=p, i=i: p.filter_func(x[i]), it)
         else:
-            it = filter(self.predicates.filter_func, storage[self.predicates.comp])  # type: ignore
+            it = filter(self.predicates.filter_func, storage[self.predicates.comp])
         return it
 
 
@@ -99,17 +97,9 @@ class QueryBuilder:
         if isinstance(p, _Predicate):
             self.predicates.append(p)
         else:
-            self.predicates.append(with_none(p))
+            self.predicates.append(not_none(p))
 
     def build(self) -> Query:
         if len(self.predicates) == 0:
             raise RuntimeError("Cannot build query from an empty set of predicates")
         return Query(*self.predicates)
-
-
-def _flatten(it: Iterable[Any]) -> Iterator[Any]:
-    for x in it:
-        if isinstance(x, Iterable):
-            yield from _flatten(x)
-        else:
-            yield x

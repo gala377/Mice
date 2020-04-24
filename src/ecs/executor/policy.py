@@ -12,9 +12,7 @@ class ResumePolicy:
 
 class AsyncWait(ResumePolicy):
 
-    # should be Callable[..., Any] but mypy thinks its a method
-    # and doesn't allow any assignments
-    func: Any
+    func: Callable[..., Any]
     args: Tuple[Any, ...]
     kwargs: Mapping[str, Any]
 

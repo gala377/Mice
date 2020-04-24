@@ -6,7 +6,7 @@ from typing import (
 
 from ecs.system import GeneratorSystem
 
-from mice_common.autoregister import register
+from libmice.autoregister import register
 
 
 @register

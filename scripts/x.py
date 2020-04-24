@@ -24,24 +24,24 @@ def _run(cmd: str, /, *args: str, capture_std=True):
 
 
 @app.command()
-def check(*, black: bool = True, flake: bool = True, mypy: bool = True, strict: bool = True):
+def check(
+    *, black: bool = True, flake: bool = True, strict: bool = True
+):
     if strict:
-        black = flake = mypy = True
-    _check(black, flake, mypy)
+        black = flake = True
+    _check(black, flake)
 
 
-def _check(black: bool, flake: bool, mypy: bool):
+def _check(black: bool, flake: bool):
     if black:
         _run("black", "src")
     if flake:
         _run("flake8", "src")
-    if mypy:
-        _run("mypy", "src")
 
 
 @app.command()
-def build(*, black: bool = True, flake: bool = True, mypy: bool = False):
-    _check(black, flake, mypy)
+def build(*, black: bool = True, flake: bool = True):
+    _check(black, flake)
     _run("poetry", "build", capture_std=False)
 
 

@@ -1,5 +1,5 @@
 from typing import MutableMapping, Sequence, Optional, Type, Callable
-from functools import singledispatchmethod  # type: ignore
+from functools import singledispatchmethod
 
 from ecs.executor.abc import Executor
 from ecs.system import System
@@ -56,11 +56,11 @@ class World:
     def _(self, system: System):
         self.systems[type(system).__name__] = system
 
-    @register.register  # type: ignore
+    @register.register
     def _(self, name: str, system: System):
         self.systems[name] = system
 
-    @register.register  # type: ignore
+    @register.register
     def _(self, name: str, components: Sequence[Component]):
         en = self.entity_storage.create_entity(components)
         self.resources[name] = en

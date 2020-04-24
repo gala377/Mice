@@ -10,15 +10,26 @@ RunningSystem = Generator[Optional[ResumePolicy], Any, Any]
 
 class System(ABC):
 
-    entity_storage: entity.Storage
-    resources: Mapping[str, Entity]
+    __entity_storage: entity.Storage
+    __resources: Mapping[str, Entity]
 
     def init(
         self, storage: entity.Storage, resources: Mapping[str, Entity]
     ) -> RunningSystem:
-        self.entity_storage = storage
-        self.resources = resources
+        self._init(storage, resources)
         return self.run()
+
+    def _init(self, storage: entity.Storage, resources: Mapping[str, Entity]):
+        self.__entity_storage = storage
+        self.__resources = resources
+
+    @property
+    def entity_storage(self):
+        return self.__entity_storage
+
+    @property
+    def resources(self):
+        return self.__resources
 
     @abstractmethod
     def run(self) -> RunningSystem:
@@ -35,6 +46,13 @@ class GeneratorSystem(System):
 
 
 class SimpleSystem(GeneratorSystem):
+    def _init(self, storage, resources):
+        super()._init(storage, resources)
+        self.create()
+
+    def create(self):
+        ...
+
     def start(self):
         ...
 
@@ -58,10 +76,10 @@ class IteratorSystem(GeneratorSystem, RunningSystem):
         ...
 
     def send(self, val: Any):
-        raise NotImplementedError("SimpleSytem doesn't implement send method")
+        raise NotImplementedError("IteratorSystem doesn't implement send method")
 
     def throw(self, typ, val=None, tb=None):
-        err = NotImplementedError("SimpleSystem doesn't implement throw method")
+        err = NotImplementedError("IteratorSystem doesn't implement throw method")
         if val is None:
             if tb is None:
                 raise err from typ
@@ -71,4 +89,4 @@ class IteratorSystem(GeneratorSystem, RunningSystem):
         raise err from val
 
     def close(self):
-        raise NotImplementedError("SimpleSystem doesn't implement close method")
+        raise NotImplementedError("IteratorSystem doesn't implement close method")

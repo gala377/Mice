@@ -6,7 +6,7 @@ license = "MIT"
 authors = ["Rafał Galczak <r.galczak@gmail.com>"]
 packages = [ 
     { include = "mice", from = "src" },
-    { include = "mice_common", from = "src" },
+    { include = "libmice", from = "src" },
     { include = "pygame_plugin", from = "src" },
     { include = "ecs", from = "src" },
     { include = "example", from ="src" },
@@ -21,7 +21,6 @@ pytest = "^5.2"
 pylint = "^2.4.4"
 flake8 = "^3.7.9"
 black = "^19.10b0"
-mypy = "^0.761.0"
 typer = "^0.0.10"
 rope = "^0.16.0"
 

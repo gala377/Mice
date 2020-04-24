@@ -1,5 +1,5 @@
 from mice import resource
-from mice.components import Image, Transform
+from mice.common.components import Image, Transform
 
 from example.components import Grid, DebugView
 

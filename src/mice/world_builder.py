@@ -33,7 +33,7 @@ class WorldBuilder:
 
     def add_system(self, system: System, add_front: bool = False):
         if add_front:
-            self._systems = [system] + self._systems  # type: ignore
+            self._systems = [system] + self._systems
         else:
             self._systems.append(system)
 
