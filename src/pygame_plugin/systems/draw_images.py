@@ -12,35 +12,6 @@ from pygame_plugin.components import Image
 
 
 @register
-class WindowEvents(GeneratorSystem):
-    def __iter__(self) -> RunningSystem:
-        yield None
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit(0)
-            yield None
-
-
-class DrawWindow(GeneratorSystem):
-
-    window_name: str
-
-    def __init__(self, window_name: str):
-        super().__init__()
-        self.window_name = window_name
-
-    def __iter__(self) -> RunningSystem:
-        [window] = self.resources[self.window_name].components
-        yield None
-        while True:
-            window.display.fill((0, 0, 0))
-            yield defer
-            pygame.display.flip()
-            yield None
-
-
-@register
 class DrawImages(GeneratorSystem):
 
     window_name: str
