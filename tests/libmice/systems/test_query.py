@@ -27,7 +27,7 @@ def storage():
     }
 
 
-@pytest.mark.parametrize("key", [A, B])
+@pytest.mark.parametrize("key", [A, B, C])
 def test_with_none_predicate_for_single_class(storage, key):
     out = [x for x in Query(with_none(key)).execute(storage)]
     assert out == storage[key]
@@ -39,7 +39,7 @@ def test_with_none_predicate_for_multiple_classes(storage):
     assert out == exp
 
 
-@pytest.mark.parametrize("key", [A, B])
+@pytest.mark.parametrize("key", [A, B, C])
 def test_not_none_predicate_for_single_class(storage, key):
     it = [x for x in Query(not_none(key)).execute(storage)]
     exp = [x for x in filter(lambda x: x is not None, storage[key])]
@@ -52,7 +52,7 @@ def test_not_none_predicate_for_multiple_classes(storage):
     assert out == exp
 
 
-@pytest.mark.parametrize("key", [A, B])
+@pytest.mark.parametrize("key", [A, B, C])
 def test_is_none_predicate_for_single_class(storage, key):
     out = [x for x in Query(is_none(key)).execute(storage)]
     exp = [x for x in filter(lambda x: x is None, storage[key])]
