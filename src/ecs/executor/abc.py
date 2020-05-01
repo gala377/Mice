@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Mapping
+from typing import MutableMapping, Mapping
 from ecs.system import System
 from ecs import entity
 
@@ -15,7 +15,7 @@ class Executor(ABC):
         ...
 
     @abstractmethod
-    def run_iteration(self, systems: Mapping[str, System]) -> None:
+    def run_iteration(self, systems: MutableMapping[str, System]) -> None:
         ...
 
     @abstractmethod

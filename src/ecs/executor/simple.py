@@ -9,25 +9,37 @@ from typing import (
     Any,
     Optional,
     MutableSequence,
+    MutableSet,
 )
-from multiprocessing.pool import AsyncResult
 
 from ecs.system import System, RunningSystem
 from ecs.executor.abc import Executor
-from ecs.executor.policy import ResumePolicy, AsyncWait, Defer
+from ecs.executor.policy import (
+    ResumePolicy,
+    Defer,
+    Restart,
+    Terminate,
+    Pause,
+    Unpause,
+    Start,
+)
 from ecs import entity
 
 
 LOGGER = logging.getLogger(__name__)
 
-
+"""
+TODO: Support for pause, unpause nad start resume policies
+"""
 class SimpleExecutor(Executor):
+    
 
     systems: MutableMapping[str, RunningSystem]
-    stopped_systems: MutableMapping[str, AsyncResult]
-    pool: mp.pool.Pool
 
-    defered_systems: MutableSequence[str]
+    defered_systems: MutableSet[str]
+    paused_systems: MutableSet[str]
+    systems_to_restart: MutableSet[str]
+
 
     def __init__(
         self,
@@ -36,18 +48,16 @@ class SimpleExecutor(Executor):
         res: Mapping[str, entity.Entity],
     ):
         self.systems = {n: s.init(storage, res) for n, s in systems.items()}
-        self.stopped_systems = {}
-        self.pool = mp.Pool()
-        self.defered_systems = []
+        self.defered_systems = set()
+        self.paused_systems = set()
+        self.storage = storage
+        self.resources = res
 
-    def run_iteration(self, systems: Mapping[str, System]):
+
+    def run_iteration(self, systems: MutableMapping[str, System]):
         for name, (_, iterator) in self.active_systems(systems).items():
-            LOGGER.debug("[%s]: Running %s system.", time.time(), name)
             res = next(iterator)
-            self.match_yield(name, res)
-            if len(self.stopped_systems) > 0:
-                self.pool_waiting()
-            LOGGER.debug("[%s]: Finnished", time.time())
+            self.match_yield(name, res, systems)
         for name in self.defered_systems:
             next(self.systems[name])
         self.defered_systems.clear()
@@ -58,55 +68,38 @@ class SimpleExecutor(Executor):
         return {
             name: (instance, self.systems[name])
             for name, instance in systems.items()
-            if name not in self.stopped_systems
+            if name not in self.paused_systems
         }
 
-    def match_yield(self, system_name: str, yieldk: Optional[ResumePolicy]) -> bool:
-        """
-        Schedules system based on the yielded value.
-        
-        Returns:
-            True if system should be scheduled for the next iteration.
-            Flase if the system should be paused.
-
-        TODO:
-            Can be sped up. Instead of checking `isinstance` check
-            for tag being an int or smth.
-        """
-        if isinstance(yieldk, AsyncWait):
-            self.async_wait(system_name, yieldk.func, *yieldk.args, **yieldk.kwargs)
-            return False
-        if isinstance(yieldk, Defer):
-            self.defered_systems.append(system_name)
-            return False
-        return True
-
-    def async_wait(self, system: str, op: Callable, *args: Any, **kwargs: Any):
-        res = self.pool.apply_async(op, args=args, kwds=kwargs)
-        self.stopped_systems[system] = res
-
-    def pool_waiting(self):
-        resume = []
-        for name, op in self.stopped_systems.items():
-            if op.ready():
-                LOGGER.debug("[%s][World]: Resuming system %s", time.time(), name)
-                res = self.systems[name].send(op.get())
-                if self.match_yield(name, res):
-                    resume.append(name)
-        for name in resume:
-            del self.stopped_systems[name]
+    def match_yield(self, system_name: str, yieldk: Optional[ResumePolicy], systems: MutableMapping[str, System]):
+        if yieldk is None:
+            return
+        tag = yieldk.tag()
+        if tag == Defer.TAG:
+            self.defered_systems.add(system_name)
+        elif tag == Restart.TAG:
+            self.systems[system_name] = self.systems[system_name].run()
+        elif tag == Pause.TAG:
+            self.paused_systems.add(system_name)
+        elif tag == Unpause.TAG:
+            self.paused_systems.remove(yieldk.system)
+            if yieldk.with_args is not None:
+                res = self.systems[yieldk.system].send(*yieldk.with_args)
+                self.match_yield(yieldk.system, res, systems)
+        elif tag == Start.TAG:
+            if yieldk.system_name in self.systems:
+                raise RuntimeError(f"Tried to create system with name {yieldk.system_name} which already exists")
+            systems[yieldk.system_name] = yieldk.system_instance
+            self.systems[yieldk.system_name] = yieldk.system_instance.init(
+                self.storage, self.resources)
+        elif tag == Terminate.TAG:
+            del self.systems[system_name]
+            del systems[system_name]
+        else:
+            raise RuntimeError("Resume policy not supported on SimpleExecutor")
 
     def stop_all(self):
-        try:
-            print("Stopping systems...")
-            for s in self.systems.values():
-                s.close()
-            print("All stopped")
-            print("Stopping thread poll...")
-            self.pool.close()
-            self.pool.join()
-        except Exception as e:
-            print(f"Cought exception during stopping systems: {e}")
-            print("Terminating thread pool")
-            self.pool.terminate()
-            print("Terminated")
+        print("Stopping systems...")
+        for s in self.systems.values():
+            s.close()
+        print("All stopped")

@@ -41,7 +41,7 @@ class Game:
         wb.add_resource(
             self.WINDOW_RES, [pygame_plugin.components.Window(ws[0], ws[1])]
         )
-        print("Registering components...")
+        print("Registering resources...")
         for rn, rc in ResourceRepository.resources:
             print(f"Registering resource {rn}")
             wb.add_resource(rn, rc)
@@ -53,7 +53,7 @@ class Game:
 
     def _add_common_systems(self, wb: WorldBuilder):
         wb.add_system(pygame_plugin.systems.DrawWindow(), add_front=True)
-        print("g systems...")
+        print("adding systems...")
         for s in SystemsRepository.systems:
             print(f"Registering system {s.__class__.__name__}")
             wb.add_system(s)
