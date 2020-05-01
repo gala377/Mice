@@ -3,11 +3,11 @@ from typing import (
     Sequence,
 )
 
-from mice import resource_system
+from mice import system
 from mice.common.components import Transform, Time
 
 
-@resource_system
+@system()
 class MoveBall:
 
     speed: Tuple[float, float]

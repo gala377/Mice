@@ -9,7 +9,9 @@ import libmice
 def system(*predicates: Type):
     if len(predicates) == 1 and issubclass(predicates[0], ecs.system.System):
         return autoregister.system(predicates[0])
-
+    if len(predicates) == 0:
+        return resource_system
+    
     def wrap(cls: Type):
         class Anon(cls, libmice.systems.abc.System[predicates]):  # typing: ignore
             ...
