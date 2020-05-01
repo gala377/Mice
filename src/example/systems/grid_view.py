@@ -1,16 +1,7 @@
 import pygame
 
-from typing import (
-    Tuple,
-    Sequence,
-)
-
-from mice import (
-    Game,
-    system,
-    resource_system,
-)
-from mice.common.components import Transform
+from mice import system
+from mice.common.components import Window
 
 from example.components import (
     Grid,
@@ -20,19 +11,8 @@ from example.components import (
 
 @system(Grid, DebugView)
 class GridView:
-
-    window_name: str
-    grid_name: str
-
-    default_args = [Game.WINDOW_RES, "grid"]
-
-    def __init__(self, wn: str, gn: str):
-        super().__init__()
-        self.window_name = wn
-        self.grid_name = gn
-
     def create(self):
-        [self.window] = self.resources[self.window_name].components
+        self.window = self.resources.window[Window]
 
     def update(self):
         for grid, _ in self.components:

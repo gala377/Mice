@@ -24,8 +24,7 @@ from mice.world_builder import WorldBuilder
 
 class Game:
 
-    TIMER_RES = "timer"
-    WINDOW_RES = "WINDOW"
+    WINDOW_RES = "window"
 
     _world: World
 
@@ -53,7 +52,7 @@ class Game:
             wb.add_component(c)
 
     def _add_common_systems(self, wb: WorldBuilder):
-        wb.add_system(pygame_plugin.systems.DrawWindow(self.WINDOW_RES), add_front=True)
+        wb.add_system(pygame_plugin.systems.DrawWindow(), add_front=True)
         print("g systems...")
         for s in SystemsRepository.systems:
             print(f"Registering system {s.__class__.__name__}")

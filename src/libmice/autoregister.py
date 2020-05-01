@@ -58,7 +58,11 @@ class ResourceRepository:
 
 def resource(name: Union[str, Type[Any]]):
     def inner(cls: Type[Any]):
-        _name = name if isinstance(name, str) else getattr(cls, "name", cls.__name__)
+        _name = (
+            name
+            if isinstance(name, str)
+            else getattr(cls, "name", _camel_case_to_snake_case(cls.__name__))
+        )
         comps = getattr(cls, "components", [])
         ResourceRepository.add(_name, comps)
         return cls
@@ -66,3 +70,15 @@ def resource(name: Union[str, Type[Any]]):
     if isinstance(name, str):
         return inner
     return inner(name)
+
+
+def _camel_case_to_snake_case(name: str) -> str:
+    new_name = ""
+    for i in range(len(name)):
+        if name[i].isupper():
+            if i > 0:
+                new_name += "_"
+            new_name += name[i].lower()
+        else:
+            new_name += name[i]
+    return new_name

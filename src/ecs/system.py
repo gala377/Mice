@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 from typing import Generator, Any, Optional, Mapping
+from types import SimpleNamespace
 
 from ecs import entity
 from ecs.entity import Entity
@@ -12,6 +13,7 @@ class System(ABC):
 
     __entity_storage: entity.Storage
     __resources: Mapping[str, Entity]
+    __res_proxy: object
 
     def init(
         self, storage: entity.Storage, resources: Mapping[str, Entity]
@@ -22,6 +24,9 @@ class System(ABC):
     def _init(self, storage: entity.Storage, resources: Mapping[str, Entity]):
         self.__entity_storage = storage
         self.__resources = resources
+        self.__res_proxy = SimpleNamespace()
+        for res, en in self.__resources.items():
+            setattr(self.__res_proxy, res, en)
 
     @property
     def entity_storage(self):
@@ -29,7 +34,7 @@ class System(ABC):
 
     @property
     def resources(self):
-        return self.__resources
+        return self.__res_proxy
 
     @abstractmethod
     def run(self) -> RunningSystem:

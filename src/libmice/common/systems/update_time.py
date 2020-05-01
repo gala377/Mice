@@ -1,27 +1,13 @@
-from typing import (
-    Mapping,
-    Sequence,
-    Any,
-)
-
 from ecs.system import GeneratorSystem
 
 from libmice.autoregister import register
+from libmice.common.components import Time
 
 
 @register
 class UpdateTime(GeneratorSystem):
-
-    res_name: str
-    default_args: Sequence[Any] = ["timer"]
-    default_kwargs: Mapping[str, Any] = {}
-
-    def __init__(self, res_name: str):
-        super().__init__()
-        self.res_name = res_name
-
     def __iter__(self):
-        [timer] = self.resources[self.res_name].components
+        timer = self.resources.timer[Time]
         timer.update()
         yield None
         while True:

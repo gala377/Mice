@@ -8,22 +8,35 @@ from typing import (
     Optional,
     MutableMapping,
     MutableSequence,
+    Mapping,
 )
 
 from ecs.component import Component
-from ecs.genid import GenId, Allocator, NotEnoughSpace
+from ecs.genid import (
+    GenId,
+    Allocator,
+    NotEnoughSpace,
+)
 
-
-@dataclass
 class Entity:
 
     id: GenId
-    components: Sequence[Component]
     _storage: weakref.ReferenceType  # Storage weakref
+    _mapped_comps: Mapping[Type[Component], Component]
+
+    def __init__(
+        self, id: GenId, comps: Mapping[Type, Component], ref: weakref.ReferenceType
+    ):
+        self.id = id
+        self._storage = ref
+        self._mapped_comps = comps
 
     def __del__(self):
         if self._storage() is not None:
             self._storage().remove_entity(self.id)
+
+    def __getitem__(self, comp: Type[Component]) -> Component:
+        return self._mapped_comps[comp]
 
 
 class Storage(ABC):
@@ -91,11 +104,7 @@ class SOAStorage(Storage):
     def get_entity(self, id: GenId) -> Optional[Entity]:
         if not self.allocator.is_valid(id):
             return None
-        comps = [
-            array[id.id]
-            for _, array in self.components.items()
-            if array[id.id] is not None
-        ]
+        comps = {comp: array[id.id] for comp, array in self.components.items()}
         return Entity(id, comps, weakref.ref(self))
 
     def get_component(self, comp: Type[Component]) -> Sequence[Optional[Component]]:
