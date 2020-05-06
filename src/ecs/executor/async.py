@@ -23,6 +23,8 @@ LOGGER = logging.getLogger(__name__)
 """
 TODO: Old executor, needs imporvements
 """
+
+
 class Async(Executor):
 
     systems: MutableMapping[str, RunningSystem]
@@ -74,6 +76,8 @@ class Async(Executor):
         TODO:
             Can be sped up. Instead of checking `isinstance` check
             for tag being an int or smth.
+
+            Look at `SimpleExecutor`
         """
         if isinstance(yieldk, AsyncWait):
             self.async_wait(system_name, yieldk.func, *yieldk.args, **yieldk.kwargs)

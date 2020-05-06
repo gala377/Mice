@@ -9,9 +9,11 @@ from typing import (
 
 
 class ResumePolicy:
-    
     def tag(self):
-        raise NotImplementedError(f"{self.__class__.__name__} doesn't implement ResumePolicy's tag method")
+        raise NotImplementedError(
+            f"{self.__class__.__name__} doesn't implement ResumePolicy's tag method"
+        )
+
 
 class AsyncWait(ResumePolicy):
 
@@ -31,7 +33,7 @@ class AsyncWait(ResumePolicy):
 
 
 class Defer(ResumePolicy):
-    
+
     TAG = 1
 
     def tag(self):
@@ -57,6 +59,7 @@ class Pause(ResumePolicy):
 class Restart(ResumePolicy):
 
     TAG = 5
+
     def tag(self):
         return self.TAG
 
@@ -77,7 +80,7 @@ class Unpause(ResumePolicy):
 class Start(ResumePolicy):
 
     TAG = 7
-  
+
     system_instance: Any
     system_name: str
 
@@ -85,7 +88,7 @@ class Start(ResumePolicy):
         self.system_instance = system_instance
         if name is None:
             name = system_instance.__class__.__name__
-        self.system_name = name 
+        self.system_name = name
 
     def tag(self):
         return self.TAG

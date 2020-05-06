@@ -10,6 +10,7 @@ packages = [
     { include = "pygame_plugin", from = "src" },
     { include = "ecs", from = "src" },
     { include = "example", from ="src" },
+    { include = "snake", from="src "},
 ]
 
 [tool.poetry.dependencies]

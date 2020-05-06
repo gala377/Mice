@@ -14,7 +14,7 @@ def system(*predicates: Type, register=True):
             return False
     if len(predicates) == 0:
         return resource_system(register)
-    
+
     def wrap(cls: Type):
         class Anon(cls, libmice.systems.abc.System[predicates]):  # typing: ignore
             ...
@@ -29,9 +29,10 @@ def system(*predicates: Type, register=True):
     return wrap
 
 
-def resource_system(register=True):
+def resource_system(cls, register=True):
     if not isinstance(register, bool):
         print("resource_system without bool")
+
         class Anon(cls, ecs.system.SimpleSystem):
             ...
 
@@ -41,8 +42,9 @@ def resource_system(register=True):
 
         autoregister.system(Anon)
         return Anon
-    
+
     print("resource system with bool")
+
     def wrapper(cls):
         class Anon(cls, ecs.system.SimpleSystem):
             ...
@@ -53,4 +55,5 @@ def resource_system(register=True):
         if register:
             autoregister.system(Anon)
         return Anon
+
     return wrapper

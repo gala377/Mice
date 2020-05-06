@@ -1,7 +1,6 @@
 import weakref
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import (
     Type,
     Sequence,
@@ -17,6 +16,7 @@ from ecs.genid import (
     Allocator,
     NotEnoughSpace,
 )
+
 
 class Entity:
 

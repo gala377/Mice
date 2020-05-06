@@ -21,18 +21,4 @@ As of now **Mice** is split into two packages:
 TODO
 -------------------
 
-Global
-    - Keepachangelog.
-    - Fix CI.
-
-ECS
-    - Components queries instead of pulling the world object.
-    - Concurrent components looping.
-    - Concurrent system execution.
-    - Unit tests of ecs system.
-    - Documentation of the ecs system.
-
-Mice
-    - Custom world object with common resources.
-    - Documentation.
-    - Unit tests.
+Look at project repository on github https://github.com/gala377/Mice

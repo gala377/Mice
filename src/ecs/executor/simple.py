@@ -1,14 +1,9 @@
 import logging
-import time
-import multiprocessing as mp
 from typing import (
     MutableMapping,
     Mapping,
     Tuple,
-    Callable,
-    Any,
     Optional,
-    MutableSequence,
     MutableSet,
 )
 
@@ -28,18 +23,14 @@ from ecs import entity
 
 LOGGER = logging.getLogger(__name__)
 
-"""
-TODO: Support for pause, unpause nad start resume policies
-"""
+
 class SimpleExecutor(Executor):
-    
 
     systems: MutableMapping[str, RunningSystem]
 
     defered_systems: MutableSet[str]
     paused_systems: MutableSet[str]
     systems_to_restart: MutableSet[str]
-
 
     def __init__(
         self,
@@ -52,7 +43,6 @@ class SimpleExecutor(Executor):
         self.paused_systems = set()
         self.storage = storage
         self.resources = res
-
 
     def run_iteration(self, systems: MutableMapping[str, System]):
         for name, (_, iterator) in self.active_systems(systems).items():
@@ -71,7 +61,12 @@ class SimpleExecutor(Executor):
             if name not in self.paused_systems
         }
 
-    def match_yield(self, system_name: str, yieldk: Optional[ResumePolicy], systems: MutableMapping[str, System]):
+    def match_yield(
+        self,
+        system_name: str,
+        yieldk: Optional[ResumePolicy],
+        systems: MutableMapping[str, System],
+    ):
         if yieldk is None:
             return
         tag = yieldk.tag()
@@ -88,10 +83,13 @@ class SimpleExecutor(Executor):
                 self.match_yield(yieldk.system, res, systems)
         elif tag == Start.TAG:
             if yieldk.system_name in self.systems:
-                raise RuntimeError(f"Tried to create system with name {yieldk.system_name} which already exists")
+                raise RuntimeError(
+                    f"Tried to create system with name {yieldk.system_name} which already exists"
+                )
             systems[yieldk.system_name] = yieldk.system_instance
             self.systems[yieldk.system_name] = yieldk.system_instance.init(
-                self.storage, self.resources)
+                self.storage, self.resources
+            )
         elif tag == Terminate.TAG:
             del self.systems[system_name]
             del systems[system_name]

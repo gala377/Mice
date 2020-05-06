@@ -1,7 +1,5 @@
 # flake8: noqa
 
-from typing import Tuple, Sequence
-
 from mice import (
     Game,
     WorldBuilder,
