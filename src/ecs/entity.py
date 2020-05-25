@@ -31,7 +31,7 @@ class Entity:
         self._storage = ref
         self._mapped_comps = comps
 
-    def __del__(self):
+    def delete(self):
         if self._storage() is not None:
             self._storage().remove_entity(self.id)
 
@@ -53,7 +53,7 @@ class Storage(ABC):
         ...
 
     @abstractmethod
-    def create_entity(self, comp: Sequence[Component]) -> Entity:
+    def create_entity(self, *comp: Component) -> Entity:
         ...
 
     @abstractmethod
@@ -80,7 +80,8 @@ class SOAStorage(Storage):
             return
         self.components[comp] = [None] * self.INITIAL_CAPACITY
 
-    def create_entity(self, comps: Sequence[Component]) -> Entity:
+    def create_entity(self, *comps: Component) -> Entity:
+        print(f"Creating entity with comp {comps=}")
         try:
             idx = self.allocator.allocate()
             for c in comps:

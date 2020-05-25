@@ -2,18 +2,24 @@ from mice import resource
 
 from .components import *
 
-@resource
-class WorldGrid:
-
-    components = [
-        Grid(20),
-    ]
-
 
 @resource
 class Player:
 
     components = [
-        GridPosition(0, 0),
-        SquareSprite((255, 255, 255), 10),
+        Snake([
+            GridPosition(0, 0),
+            GridPosition(0, 1),
+            GridPosition(0, 2),
+        ], GridPosition(0, 0)),
+        SquareSprite((255, 255, 255), 20),
+    ]
+
+
+@resource
+class Game:
+
+    components = [
+        GameState(),
+        Grid(20),
     ]

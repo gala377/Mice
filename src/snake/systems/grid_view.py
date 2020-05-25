@@ -10,7 +10,7 @@ class GridDebugView:
 
     def create(self):
         self.window = self.resources.window[Window]
-        self.grid = self.resources.world_grid[Grid]
+        self.grid = self.resources.game[Grid]
 
     def update(self):
         for i in range((self.window.height // self.grid.size) + 1):

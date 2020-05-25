@@ -62,7 +62,7 @@ class World:
 
     @register.register
     def _(self, name: str, components: Sequence[Component]):
-        en = self.entity_storage.create_entity(components)
+        en = self.entity_storage.create_entity(*components)
         self.resources[name] = en
 
     def register_component(self, comp: Type[Component]):
