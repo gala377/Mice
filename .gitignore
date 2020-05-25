@@ -5,6 +5,7 @@
 .custom
 *.pyc
 *.egg-info
+.dir-locals.el
 
 __pycache__/
 *.py[cod]
